@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matematická Výzva</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 15px;
+      background-color: #f0f4f8;
+      color: #333;
+    }
+    .card {
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #1e293b;
+    }
+    .mode-select {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .mode-btn {
+      padding: 8px 14px;
+      border: 2px solid #cbd5e1;
+      background-color: #f8fafc;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #475569;
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      background-color: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+    .remaining-bar {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .remaining-title {
+      font-size: 14px;
+      color: #1e40af;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .remaining-count {
+      font-size: 42px;
+      font-weight: 800;
+      color: #1d4ed8;
+      margin: 5px 0;
+    }
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #e2e8f0;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .stat-good { color: #16a34a; }
+    .stat-bad { color: #dc2626; }
+    .example-box {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .example {
+      font-size: 48px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+    }
+    .input-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    input[type="number"] {
+      font-size: 28px;
+      width: 120px;
+      padding: 8px 12px;
+      text-align: center;
+      border: 3px solid #cbd5e1;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="number"]:focus {
+      border-color: #2563eb;
+    }
+    button.btn-submit {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 10px 24px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button.btn-submit:hover {
+      background-color: #1d4ed8;
+    }
+    .feedback {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      margin: 15px 0;
+      min-height: 30px;
+    }
+    .correct-text { color: #16a34a; }
+    .wrong-text { color: #dc2626; }
+    .history-section {
+      margin-top: 30px;
+      border-top: 2px solid #e2e8f0;
+      padding-top: 20px;
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .history-header h3 {
+      margin: 0;
+    }
+    .btn-reset {
+      background: none;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-reset:hover {
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+      font-size: 15px;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #475569;
+    }
+    .status-ok {
+      background-color: #dcfce7;
+      color: #15803d;
+      font-weight: bold;
+    }
+    .status-err {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      font-weight: bold;
+    }
+    .win-box {
+      display: none;
+      text-align: center;
+      padding: 30px 10px;
+    }
+    .win-box h1 {
+      font-size: 44px;
+      margin-bottom: 10px;
+    }
+    .btn-new-game {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 30px;
+      background-color: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Matematická Výzva</h2>
+
+    <div class="mode-select">
+      <button class="mode-btn active" onclick="setMode('mix', event)">Vše (Mix)</button>
+      <button class="mode-btn" onclick="setMode('mult', event)">Násobení</button>
+      <button class="mode-btn" onclick="setMode('div', event)">Dělení</button>
+      <button class="mode-btn" onclick="setMode('add', event)">Sčítání</button>
+      <button class="mode-btn" onclick="setMode('sub', event)">Odčítání</button>
+    </div>
+
+    <div id="game-area">
+      <div class="remaining-bar">
+        <div class="remaining-title">Zbývá vyřešit příkladů</div>
+        <div class="remaining-count" id="remaining-count">100</div>
+      </div>
+
+      <div class="stats-bar">
+        <span>Správně: <span id="stat-correct" class="stat-good">0</span></span>
+        <span>Chybně: <span id="stat-wrong" class="stat-bad">0</span></span>
+        <span>Trestné body: <span id="stat-penalty" class="stat-bad">+0</span></span>
+      </div>
+
+      <div class="example-box">
+        <div class="example" id="problem">?</div>
+        
+        <form id="quiz-form" onsubmit="checkAnswer(event)">
+          <div class="input-group">
+            <input type="number" id="user-answer" autocomplete="off" required autofocus>
+            <button type="submit" class="btn-submit">OK</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div id="win-area" class="win-box">
+      <h1>🏆 DOKONČENO! 🎉</h1>
+      <p>Skvělá práce! Zvládl jsi úspěšně spočítat všechny příklady!</p>
+      <div id="final-stats" style="margin: 20px 0; font-weight: bold;"></div>
+      <button class="btn-new-game" onclick="resetChallenge()">Začít novou výzvu (100)</button>
+    </div>
+
+    <div class="history-section">
+      <div class="history-header">
+        <h3>Záznam o opravách</h3>
+        <button class="btn-reset" onclick="resetChallenge()">Restartovat výzvu</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Příklad</th>
+            <th>Odpověď</th>
+            <th>Výsledek</th>
+          </tr>
+        </thead>
+        <tbody id="history-log"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let remaining = 100;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let penaltyCount = 0;
+    let currentMode = 'mix';
+
+    let currentNum1 = 0;
+    let currentNum2 = 0;
+    let currentOp = '';
+    let currentCorrectAnswer = 0;
+    let historyData = [];
+
+    function setMode(mode, e) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add('active');
+      generateProblem();
+    }
+
+    function generateProblem() {
+      let op = currentMode;
+      if (op === 'mix') {
+        const ops = ['mult', 'div', 'add', 'sub'];
+        op = ops[Math.floor(Math.random() * ops.length)];
+      }
+
+      if (op === 'mult') { // Násobení do 10x10
+        currentNum1 = Math.floor(Math.random() * 10) + 1;
+        currentNum2 = Math.floor(Math.random() * 10) + 1;
+        currentOp = '×';
+        currentCorrectAnswer = currentNum1 * currentNum2;
+      } 
+      else if (op === 'div') { // Dělení beze zbytku
+        currentNum2 = Math.floor(Math.random() * 9) + 2;
+        const result = Math.floor(Math.random() * 10) + 1;
+        currentNum1 = currentNum2 * result;
+        currentOp = '÷';
+        currentCorrectAnswer = result;
+      } 
+      else if (op === 'add') { // Sčítání do 100
+        currentNum1 = Math.floor(Math.random() * 89) + 1;
+        currentNum2 = Math.floor(Math.random() * (100 - currentNum1)) + 1;
+        currentOp = '+';
+        currentCorrectAnswer = currentNum1 + currentNum2;
+      } 
+      else if (op === 'sub') { // Odčítání do 100
+        currentNum1 = Math.floor(Math.random() * 99) + 2;
+        currentNum2 = Math.floor(Math.random() * (currentNum1 - 1)) + 1;
+        currentOp = '-';
+        currentCorrectAnswer = currentNum1 - currentNum2;
+      }
+
+      document.getElementById('problem').innerText = `${currentNum1} ${currentOp} ${currentNum2}`;
+      const input = document.getElementById('user-answer');
+      input.value = '';
+      input.focus();
+    }
+
+    function checkAnswer(event) {
+      event.preventDefault();
+      
+      const input = document.getElementById('user-answer');
+      const userAnswer = parseInt(input.value, 10);
+      const feedback = document.getElementById('feedback');
+      
+      if (isNaN(userAnswer)) return;
+
+      const isCorrect = userAnswer === currentCorrectAnswer;
+      const problemStr = `${currentNum1} ${currentOp} ${currentNum2}`;
+
+      if (isCorrect) {
+        correctCount++;
+        remaining--;
+        feedback.innerText = "Správně! 🎉";
+        feedback.className = "feedback correct-text";
+      } else {
+        wrongCount++;
+        penaltyCount += 5;
+        remaining += 5; // Přidá 5 příkladů za chybu
+        feedback.innerText = `Chyba! ${problemStr} = ${currentCorrectAnswer} (+5 příkladů navíc)`;
+        feedback.className = "feedback wrong-text";
+      }
+
+      document.getElementById('remaining-count').innerText = remaining;
+      document.getElementById('stat-correct').innerText = correctCount;
+      document.getElementById('stat-wrong').innerText = wrongCount;
+      document.getElementById('stat-penalty').innerText = `+${penaltyCount}`;
+
+      historyData.unshift({
+        problem: problemStr,
+        answer: userAnswer,
+        correctAnswer: currentCorrectAnswer,
+        isCorrect: isCorrect
+      });
+      renderHistory();
+
+      if (remaining <= 0) {
+        finishGame();
+      } else {
+        generateProblem();
+      }
+    }
+
+    function renderHistory() {
+      const historyLog = document.getElementById('history-log');
+      historyLog.innerHTML = '';
+
+      historyData.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${historyData.length - index}</td>
+          <td>${item.problem}</td>
+          <td>${item.answer}</td>
+          <td class="${item.isCorrect ? 'status-ok' : 'status-err'}">
+            ${item.isCorrect ? 'Správně' : `Správně: ${item.correctAnswer}`}
+          </td>
+        `;
+        historyLog.appendChild(row);
+      });
+    }
+
+    function finishGame() {
+      document.getElementById('game-area').style.display = 'none';
+      document.getElementById('win-area').style.display = 'block';
+      document.getElementById('final-stats').innerText = 
+        `Vypočítáno celkem správně: ${correctCount} příkladů. Počet chyb: ${wrongCount}.`;
+    }
+
+    function resetChallenge() {
+      remaining = 100;
+      correctCount = 0;
+      wrongCount = 0;
+      penaltyCount = 0;
+      historyData = [];
+
+      document.getElementById('remaining-count').innerText = remaining;
+      document.getElementById('stat-correct').innerText = 0;
+      document.getElementById('stat-wrong').innerText = 0;
+      document.getElementById('stat-penalty').innerText = '+0';
+      document.getElementById('feedback').innerText = '';
+
+      document.getElementById('win-area').style.display = 'none';
+      document.getElementById('game-area').style.display = 'block';
+
+      renderHistory();
+      generateProblem();
+    }
+
+    generateProblem();
+  </script>
+
+</body>
+</html>
